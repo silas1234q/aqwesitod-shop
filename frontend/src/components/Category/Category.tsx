@@ -18,7 +18,7 @@ const Category = () => {
   console.log("Fetched Categories:", categories);
 
   if (!categories) return;
-  <Loader text="categories loading" />;
+  <Loader text="categories loading" size={20} />;
 
   const [hoveredId, setHoveredId] = useState<number | null>(null);
 
@@ -37,7 +37,7 @@ const Category = () => {
 
         {/* Categories Grid */}
         {isLoading ? (
-          <Loader text="categories loading" />
+          <Loader text="categories loading" size={20} />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.map((category: CategoryItem) => (

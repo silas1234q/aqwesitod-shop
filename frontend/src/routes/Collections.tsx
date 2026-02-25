@@ -89,7 +89,7 @@ const Collections = () => {
           <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
             {isCategoryLoading ? (
               <div className="flex items-center justify-center px-6 py-2">
-                <Loader text="" />
+                <Loader text="" size={20}/>
               </div>
             ) : (
               <>
@@ -168,7 +168,7 @@ const Collections = () => {
         {/* Products Grid */}
         {isFetching && products.length === 0 ? (
           <div className="col-span-full text-center py-12">
-            <Loader text="Loading products..." />
+            <Loader text="Loading products..." size={20} />
           </div>
         ) : sortedProducts.length === 0 ? (
           // Empty state
@@ -206,7 +206,7 @@ const Collections = () => {
         {/* Loading indicator for load more */}
         {isFetching && products.length > 0 && (
           <div className="mt-16 text-center">
-            <Loader text="Loading more products..." />
+            <Loader text="Loading more products..." size={30} />
           </div>
         )}
 
