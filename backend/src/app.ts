@@ -41,7 +41,7 @@ const dispatch = path.resolve(process.cwd(), "frontend", "dist");
 app.use(express.static(dispatch));
 
 //spa fallback for react router
-app.get("*", (req: Request, res: Response) => {
+app.get("/", (req: Request, res: Response) => {
   res.sendFile(path.join(dispatch, "index.html"));
 });
 
