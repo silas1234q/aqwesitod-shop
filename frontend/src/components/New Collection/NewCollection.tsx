@@ -34,7 +34,7 @@ const NewCollection = () => {
         <div className="grid gap-8 grid-cols-2 lg:grid-cols-4">
           {isLoading ? (
             <div className="w-full h-full flex items-center justify-center">
-              <Loader text="products loading" />
+              <Loader text="products loading" size={20} />
             </div>
           ) : (
             products

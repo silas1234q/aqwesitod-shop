@@ -25,7 +25,7 @@ const RootLayout = () => {
 
         {isLoading ? (
           <div className="w-screen h-screen flex items-center justify-center">
-            <Loader text={"Signing in"} />
+            <Loader text={"Signing in"} size={20} />
           </div>
         ) : (
           <>
