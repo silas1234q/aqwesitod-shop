@@ -55,4 +55,6 @@ export interface ProductDetails {
   colors: ProductColor[];
   variants: ProductVariant[];
   inStock: boolean;
+  createdAt: string;
+  updatedAt: string;
 }

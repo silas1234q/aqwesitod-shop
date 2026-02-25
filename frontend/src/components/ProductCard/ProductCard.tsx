@@ -7,7 +7,7 @@ const ProductCard = ({ product}:{product :ProductDetails}) => {
     : 0;
 
   return (
-    <Link to={`/product/${product.id}`} className="group cursor-pointer">
+    <Link to={`/product/${product.id}`} className="group cursor-pointer" state={{ images: product.images }}>
       <div>
         {/* Image Container */}
         <div className="relative aspect-square overflow-hidden bg-gray-100 mb-4">

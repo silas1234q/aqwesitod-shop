@@ -3,6 +3,7 @@ import { IoCloseOutline } from "react-icons/io5";
 import { CiHeart } from "react-icons/ci";
 import { useCart, useRemoveFromCart, useUpdateCartQuantity } from "../hooks/cart.hooks";
 import type { CartItemsType } from "../types/cartTypes";
+import Loader from "../components/UtilsComponents/Loader";
 
 // interface CartItem {
 //   id: number;
@@ -21,7 +22,7 @@ const Cart = () => {
   const cartItems: CartItemsType[] = data?.cart || [];
 
   const { mutateAsync: removeCartItem } = useRemoveFromCart();
-  const { mutateAsync: updateCartQuantity } = useUpdateCartQuantity();
+  const { mutateAsync: updateCartQuantity,isPending:isUpdating } = useUpdateCartQuantity();
   const updateQuantity = async (id: string, newQuantity: number) => {
     if (newQuantity < 1) return;
     await updateCartQuantity({ cartItemId: id, quantity: newQuantity });
@@ -140,7 +141,9 @@ const Cart = () => {
                           −
                         </button>
                         <span className="px-4 py-2 border-x border-gray-300 min-w-12.5 text-center text-sm">
-                          {item.quantity}
+                          { isUpdating ? (
+                            <Loader size={16} text=""/>
+                          ) : item.quantity}
                         </span>
                         <button
                           onClick={() =>
