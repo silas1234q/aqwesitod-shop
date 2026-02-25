@@ -2,20 +2,18 @@ import { useState } from "react";
 import ProductCard from "../components/ProductCard/ProductCard";
 // import { products } from "../utils/product";
 import type { ProductDetails } from "../types/productTypes";
-import {
-  useGetProductsByCategory,
-} from "../hooks/useProducts.hook";
+import { useGetProductsByCategory } from "../hooks/useProducts.hook";
 import { useGetCategories } from "../hooks/category.hook";
 import type { CategoryItem } from "../types/CategoryTypes";
+import Loader from "../components/UtilsComponents/Loader";
 
 const Collections = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("featured");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-
-
-  const { data: categoryData } = useGetCategories();
+  const { data: categoryData, isFetching: isCategoryLoading } =
+    useGetCategories();
   const categories = categoryData?.categories || [];
 
   const sortOptions = [
@@ -26,8 +24,10 @@ const Collections = () => {
   ];
 
   let limit = 10;
-  const { data, isFetching ,refetch} = useGetProductsByCategory(selectedCategory, limit);
-
+  const { data, isFetching, refetch } = useGetProductsByCategory(
+    selectedCategory,
+    limit,
+  );
 
   const products: ProductDetails[] = data?.productsByCategory || [];
 
@@ -38,16 +38,8 @@ const Collections = () => {
     limit += 10;
     // Refetch products with the new limit (you may need to implement this in your hook)
     refetch();
+  };
 
-  }
-
-  if (isFetching) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-500 text-lg">Loading products...</p>
-      </div>
-    );
-  }
   // Filter and sort products
   const filteredProducts = products.filter((product) => {
     if (selectedCategory === "all") return true;
@@ -78,31 +70,37 @@ const Collections = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-12 pb-6 border-b border-gray-200">
           {/* Category Filter */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
-            <div>
-              <button
-                onClick={() => setSelectedCategory("all")}
-                className={`px-6 py-2 text-sm font-light tracking-wide whitespace-nowrap transition-colors ${
-                  selectedCategory === "all"
-                    ? "bg-gray-900 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                All Products
-              </button>
-            </div>
-            {categories.map((category: CategoryItem) => (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(String(category.id))}
-                className={`px-6 py-2 text-sm font-light tracking-wide whitespace-nowrap transition-colors ${
-                  selectedCategory === category.id.toString()
-                    ? "bg-gray-900 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                {category.name}
-              </button>
-            ))}
+            {isCategoryLoading ? (
+              <div className="flex items-center justify-center">
+                <p>Loading category....</p>
+              </div>
+            ) : (
+              <>
+                <button
+                  onClick={() => setSelectedCategory("all")}
+                  className={`px-6 py-2 text-sm font-light tracking-wide whitespace-nowrap transition-colors ${
+                    selectedCategory === "all"
+                      ? "bg-gray-900 text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  All Products
+                </button>
+                {categories.map((category: CategoryItem) => (
+                  <button
+                    key={category.id}
+                    onClick={() => setSelectedCategory(String(category.id))}
+                    className={`px-6 py-2 text-sm font-light tracking-wide whitespace-nowrap transition-colors ${
+                      selectedCategory === category.id.toString()
+                        ? "bg-gray-900 text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    {category.name}
+                  </button>
+                ))}
+              </>
+            )}
           </div>
 
           {/* Sort & Filter */}
@@ -153,10 +151,10 @@ const Collections = () => {
         </div>
 
         {/* Products Grid */}
-        
+
         {isFetching ? (
           <div className="col-span-full text-center py-12">
-            <p className="text-gray-500">loading.....</p>
+            <Loader text="product loading..." />
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">

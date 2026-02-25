@@ -6,10 +6,8 @@ import { Link } from "react-router-dom";
 import Loader from "../UtilsComponents/Loader";
 
 const NewCollection = () => {
-
-  const { data,isLoading  } = useGetProducts();
+  const { data, isLoading } = useGetProducts();
   const products = data?.products || [];
-
 
   console.log("Fetched products:", products);
   return (
@@ -34,25 +32,38 @@ const NewCollection = () => {
 
         {/* Products Grid */}
         <div className="grid gap-8 grid-cols-2 lg:grid-cols-4">
-          {isLoading ? <Loader text="products loading"/> : products.slice(0, 4).map((product: ProductDetails) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+          {isLoading ? (
+            <div className="w-full h-full flex items-center justify-center">
+              <Loader text="products loading" />
+            </div>
+          ) : (
+            products
+              .slice(0, 4)
+              .map((product: ProductDetails) => (
+                <ProductCard key={product.id} product={product} />
+              ))
+          )}
         </div>
 
         {/* View All Link */}
         <div className="mt-16 text-center">
           <Link
-            to="/collections" 
+            to="/collections"
             className="inline-flex items-center gap-2 text-gray-900 text-sm tracking-[0.2em] uppercase font-medium border-b-2 border-gray-900/30 hover:border-gray-900 pb-2 transition-all duration-300 group"
           >
             View All Products
-            <svg 
-              className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" 
-              fill="none" 
-              stroke="currentColor" 
+            <svg
+              className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 8l4 4m0 0l-4 4m4-4H3"
+              />
             </svg>
           </Link>
         </div>
