@@ -4,7 +4,8 @@ import helmet from "helmet";
 import morgan from "morgan";
 import { clerkMiddleware } from "@clerk/express";
 import authRoutes from "./routers/auth.route";
-import cartRoutes from './routers/cart.routes'
+import cartRoutes from "./routers/cart.routes";
+import path from "node:path";
 
 const app = express();
 
@@ -16,7 +17,7 @@ app.use(
       "http://localhost:5173",
       "http://localhost:5174",
       "https://silas1234q.github.io",
-      "https://silas1234q.github.io/aquesitod-shop"
+      "https://silas1234q.github.io/aquesitod-shop",
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -35,6 +36,15 @@ app.get("/health", (_req: Request, res: Response) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api", cartRoutes);
+
+//serve frontend
+const dispatch = path.resolve(process.cwd(), "frontend", "dist");
+app.use(express.static(dispatch));
+
+//spa fallback for react router
+app.get("*", (req: Request, res: Response) => {
+  res.sendFile(path.join(dispatch, "index.html"));
+});
 
 app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   console.error("ERROR:", err);
