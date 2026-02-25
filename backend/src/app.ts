@@ -18,21 +18,23 @@ app.use(
         "script-src": [
           "'self'",
           "https://*.clerk.accounts.dev",
-          "https://*.clerk.com"
+          "https://*.clerk.com",
+          "blob:" // ✅ allow blob scripts if needed
         ],
+        "worker-src": ["'self'", "blob:"], // ✅ required for Clerk workers
         "connect-src": [
           "'self'",
           "https://*.clerk.accounts.dev",
           "https://*.clerk.com"
         ],
+        "img-src": ["'self'", "data:", "https:"],
         "frame-src": [
           "'self'",
           "https://*.clerk.accounts.dev",
           "https://*.clerk.com"
-        ],
-        "img-src": ["'self'", "data:", "https:"],
-      },
-    },
+        ]
+      }
+    }
   })
 );
 

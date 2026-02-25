@@ -16,8 +16,6 @@ const RootLayout = () => {
       <SignedOut>
         <div className="min-h-screen flex items-center justify-center p-6">
           <SignIn
-            forceRedirectUrl="/aquesitod-shop/"
-            fallbackRedirectUrl="/aquesitod-shop/"
           />
         </div>
       </SignedOut>
