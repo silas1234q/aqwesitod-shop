@@ -9,7 +9,32 @@ import path from "node:path";
 
 const app = express();
 
-app.use(helmet());
+
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        "script-src": [
+          "'self'",
+          "https://*.clerk.accounts.dev",
+          "https://*.clerk.com"
+        ],
+        "connect-src": [
+          "'self'",
+          "https://*.clerk.accounts.dev",
+          "https://*.clerk.com"
+        ],
+        "frame-src": [
+          "'self'",
+          "https://*.clerk.accounts.dev",
+          "https://*.clerk.com"
+        ],
+        "img-src": ["'self'", "data:", "https:"],
+      },
+    },
+  })
+);
 
 app.use(
   cors({

@@ -56,9 +56,6 @@ const router = createBrowserRouter(
       element: <ProductDetailsPage />,
     },
   ],
-  {
-    basename: "/aquesitod-shop",
-  },
 );
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
