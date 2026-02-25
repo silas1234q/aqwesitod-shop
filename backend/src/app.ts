@@ -16,8 +16,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://localhost:5174",
-      "https://silas1234q.github.io",
-      "https://silas1234q.github.io/aquesitod-shop",
+     " https://aqwesitod-shop.onrender.com"
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
