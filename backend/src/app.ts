@@ -37,8 +37,10 @@ app.use("/api/auth", authRoutes);
 app.use("/api", cartRoutes);
 
 //serve frontend
-const dispatch = path.resolve(process.cwd(), "../../frontend/dist");
+const dispatch = path.resolve(process.cwd(), "../frontend/dist");
 app.use(express.static(dispatch));
+
+console.log("Serving static files from:", dispatch);
 
 //spa fallback for react router
 app.get("/", (req: Request, res: Response) => {
