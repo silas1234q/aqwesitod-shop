@@ -4,7 +4,6 @@ import AppError from "../errors/AppError";
 import { addToCartService, removeCartItemService, updateCartItemService } from "../services/cart.service";
 import AuthError from "../errors/AuthError";
 import ValidationErrors from "../errors/ValidationError";
-import { CartType } from "../types/types";
 
 export const addToCart = catchAsync(async (req, res) => {
   const { userId: clerkId } = getAuth(req);
