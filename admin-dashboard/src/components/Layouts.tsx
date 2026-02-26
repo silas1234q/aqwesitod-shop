@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigation } from "react-router";
 import { useEffect, useState } from "react";
+import { SignedIn, SignedOut, SignIn, UserButton } from "@clerk/clerk-react";
 
 const NAV_ITEMS = [
   {
@@ -102,9 +103,7 @@ export default function Layout() {
       {/* Bottom */}
       <div className="p-3 border-t border-[#E5E3DE]">
         <div className="flex items-center gap-2.5 px-2 py-2 rounded-xl hover:bg-[#faf9f6] cursor-pointer transition-colors">
-          <div className="w-8 h-8 rounded-[9px] bg-[#E5E3DE] text-[#1A1A1A] text-[11px] font-bold flex items-center justify-center shrink-0">
-            AD
-          </div>
+          <UserButton />
           <div className="flex-1 min-w-0">
             <div className="text-[12.5px] font-semibold text-[#1A1A1A] leading-none">
               Admin User
@@ -133,7 +132,13 @@ export default function Layout() {
       className="min-h-dvh bg-[#faf9f6]"
       style={{ fontFamily: "'Sora', sans-serif" }}
     >
-      <style>{`
+      <SignedOut>
+        <div className="h-screen w-full flex items-center justify-center">
+          <SignIn />
+        </div>
+      </SignedOut>
+      <SignedIn>
+        <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
         * { font-family: 'Sora', sans-serif; box-sizing: border-box; }
         .mono { font-family: 'JetBrains Mono', monospace !important; }
@@ -141,81 +146,82 @@ export default function Layout() {
         @keyframes barProg { from { transform: scaleX(0.05); transform-origin: left } to { transform: scaleX(1); transform-origin: left } }
       `}</style>
 
-      <div className="flex min-h-dvh overflow-hidden">
-        {/* Desktop sidebar */}
-        <div className="hidden lg:block fixed left-0 top-0 bottom-0 w-58 z-50">
-          <Sidebar />
-        </div>
-
-        {/* Mobile topbar */}
-        <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-[#E5E3DE]">
-          <div className="h-14 px-4 flex items-center justify-between">
-            <button
-              onClick={() => setMobileOpen(true)}
-              className="p-2 rounded-xl hover:bg-[#E5E3DE] transition-colors"
-              aria-label="Open menu"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
-              </svg>
-            </button>
-
-            <div className="text-[13px] font-bold tracking-[-0.02em] text-[#1A1A1A]">
-              Aqwesitod
-            </div>
-
-            <div className="w-9 h-9 rounded-[10px] bg-[#E5E3DE] text-[#1A1A1A] text-[11px] font-bold flex items-center justify-center">
-              AD
-            </div>
+        <div className="flex min-h-dvh overflow-hidden">
+          {/* Desktop sidebar */}
+          <div className="hidden lg:block fixed left-0 top-0 bottom-0 w-58 z-50">
+            <Sidebar />
           </div>
-        </header>
 
-        {/* Mobile drawer */}
-        <div
-          className={`lg:hidden fixed inset-0 z-50 ${
-            mobileOpen ? "pointer-events-auto" : "pointer-events-none"
-          }`}
-        >
-          <button
-            type="button"
-            aria-label="Close menu"
-            onClick={() => setMobileOpen(false)}
-            className={`absolute inset-0 bg-black/50 transition-opacity duration-200 ${
-              mobileOpen ? "opacity-100" : "opacity-0"
-            }`}
-          />
+          {/* Mobile topbar */}
+          <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-[#E5E3DE]">
+            <div className="h-14 px-4 flex items-center justify-between">
+              <button
+                onClick={() => setMobileOpen(true)}
+                className="p-2 rounded-xl hover:bg-[#E5E3DE] transition-colors"
+                aria-label="Open menu"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
+                </svg>
+              </button>
+
+              <div className="text-[13px] font-bold tracking-[-0.02em] text-[#1A1A1A]">
+                Aqwesitod
+              </div>
+
+              <div className="w-9 h-9 rounded-[10px] bg-[#E5E3DE] text-[#1A1A1A] text-[11px] font-bold flex items-center justify-center">
+                AD
+              </div>
+            </div>
+          </header>
+
+          {/* Mobile drawer */}
           <div
-            className={`absolute top-0 left-0 h-dvh w-67.5 bg-white shadow-2xl transform transition-transform duration-200 ${
-              mobileOpen ? "translate-x-0" : "-translate-x-full"
+            className={`lg:hidden fixed inset-0 z-50 ${
+              mobileOpen ? "pointer-events-auto" : "pointer-events-none"
             }`}
           >
-            <Sidebar onNavigate={() => setMobileOpen(false)} />
+            <button
+              type="button"
+              aria-label="Close menu"
+              onClick={() => setMobileOpen(false)}
+              className={`absolute inset-0 bg-black/50 transition-opacity duration-200 ${
+                mobileOpen ? "opacity-100" : "opacity-0"
+              }`}
+            />
+            <div
+              className={`absolute top-0 left-0 h-dvh w-67.5 bg-white shadow-2xl transform transition-transform duration-200 ${
+                mobileOpen ? "translate-x-0" : "-translate-x-full"
+              }`}
+            >
+              <Sidebar onNavigate={() => setMobileOpen(false)} />
+            </div>
           </div>
-        </div>
 
-        {/* Main */}
-        <main
-          className={`
+          {/* Main */}
+          <main
+            className={`
             flex-1 overflow-y-auto relative transition-opacity duration-150
             ${loading ? "opacity-50 pointer-events-none" : ""}
             pt-14 lg:pt-0
             lg:pl-58
           `}
-        >
-          {loading && (
-            <div className="fixed top-0 left-0 right-0 h-0.5 z-60 bg-[#1A1A1A] animate-[barProg_700ms_ease_forwards]" />
-          )}
-          <div className="animate-[rise_220ms_ease_both] p-4 sm:p-6 lg:p-8">
-            <Outlet />
-          </div>
-        </main>
-      </div>
+          >
+            {loading && (
+              <div className="fixed top-0 left-0 right-0 h-0.5 z-60 bg-[#1A1A1A] animate-[barProg_700ms_ease_forwards]" />
+            )}
+            <div className="animate-[rise_220ms_ease_both] p-4 sm:p-6 lg:p-8">
+              <Outlet />
+            </div>
+          </main>
+        </div>
+      </SignedIn>
     </div>
   );
 }

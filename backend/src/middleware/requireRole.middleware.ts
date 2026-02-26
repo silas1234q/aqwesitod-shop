@@ -6,7 +6,7 @@ import { prisma } from "../config/prisma";
 import NotFoundError from "../errors/NotFoundError";
 import ForbiddenError from "../errors/ForbiddenError";
 
-const requireRole =
+export const requireRole =
   (...allowedRoles: Role[]) =>
   async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = getAuth(req);

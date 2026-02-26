@@ -5,6 +5,7 @@ import morgan from "morgan";
 import { clerkMiddleware } from "@clerk/express";
 import authRoutes from "./routers/auth.route";
 import cartRoutes from "./routers/cart.routes";
+import productRoute from './routers/product.route'
 import path from "node:path";
 
 const app = express();
@@ -62,6 +63,7 @@ app.get("/health", (_req: Request, res: Response) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api", cartRoutes);
+app.use("/api/products", productRoute);
 
 //serve frontend
 const dispatch = path.resolve(process.cwd(), "../frontend/dist");
