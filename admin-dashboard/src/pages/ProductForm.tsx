@@ -10,6 +10,8 @@ import {
   RemovableItem,
 } from "../components/Ui";
 
+import { uploadToCloudinary } from "../utils/cloudinary";
+
 // ─── Types matching Prisma schema ─────────────────────────────────────────────
 
 type ProductColor = {
@@ -125,6 +127,11 @@ export default function ProductForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
 
+
+  const [primaryUploading, setPrimaryUploading] = useState(false);
+  const [galleryUploading, setGalleryUploading] = useState(false);
+  const [galleryError, setGalleryError] = useState<string | null>(null);
+
   const [form, setForm] = useState<FormState>({
     name: "",
     description: "",
@@ -189,25 +196,6 @@ export default function ProductForm() {
       { id: uid(), size: val, sortOrder: form.sizes.length },
     ]);
     setNewSize("");
-  }
-
-  // ── Images ─────────────────────────────────────────────────────────────────
-  const [newImageUrl, setNewImageUrl] = useState("");
-  const [newImageAlt, setNewImageAlt] = useState("");
-
-  function addImage() {
-    if (!newImageUrl.trim()) return;
-    set("images", [
-      ...form.images,
-      {
-        id: uid(),
-        url: newImageUrl.trim(),
-        alt: newImageAlt.trim(),
-        sortOrder: form.images.length,
-      },
-    ]);
-    setNewImageUrl("");
-    setNewImageAlt("");
   }
 
   // ── Details ────────────────────────────────────────────────────────────────
@@ -277,7 +265,7 @@ export default function ProductForm() {
     else if (isNaN(parseFloat(form.priceCents)))
       e.priceCents = "Must be a valid number";
     if (!form.primaryImageUrl.trim())
-      e.primaryImageUrl = "Primary image URL is required";
+      e.primaryImageUrl = "Primary image  is required";
     setErrors(e);
     if (Object.keys(e).length) {
       setStep("basics");
@@ -557,46 +545,90 @@ export default function ProductForm() {
         {/* ─── STEP 2: Media ──────────────────────────────────────────────── */}
         {step === "media" && (
           <div className="space-y-5 animate-[rise_180ms_ease_both]">
+            {/* Primary */}
             <Section
               title="Primary Image"
-              subtitle="The main image shown in product listings and search results"
+              subtitle="Upload the main image shown in product listings and search results"
             >
-              <Input
-                label="Primary Image URL *"
-                value={form.primaryImageUrl}
-                onChange={(e) => set("primaryImageUrl", e.target.value)}
-                placeholder="https://cdn.example.com/products/shirt-hero.jpg"
-                error={errors.primaryImageUrl}
-              />
-              {form.primaryImageUrl && (
-                <div className="mt-4 rounded-xl overflow-hidden ring-1 ring-[#E5E3DE] bg-[#faf9f6] h-48 flex items-center justify-center">
-                  <img
-                    src={form.primaryImageUrl}
-                    alt="Primary preview"
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
-                    }}
-                  />
-                </div>
-              )}
+              <div className="flex flex-col gap-3">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="block w-full text-[13px] text-[#1A1A1A]
+                    file:mr-3 file:px-4 file:py-2.5 file:rounded-xl
+                    file:border-0 file:bg-[#E5E3DE] file:text-[#1A1A1A]
+                    file:font-semibold hover:file:bg-[#d5d2cc]
+                    cursor-pointer"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    console.log("Selected file:", file);
+                    if (!file) return;
+
+                    try {
+                      setPrimaryUploading(true);
+
+                      const uploaded = await uploadToCloudinary(file)
+                      set("primaryImageUrl", uploaded);
+                      console.log("Uploaded primary image:", uploaded);
+                      setErrors((prev) => {
+                        const next = { ...prev };
+                        delete next.primaryImageUrl;
+                        return next;
+                      });
+                    } catch (err: any) {
+                      setErrors((prev) => ({
+                        ...prev,
+                        primaryImageUrl: err?.message ?? "Upload failed",
+                      }));
+                    } finally {
+                      setPrimaryUploading(false);
+                      e.target.value = ""; // allow reselect same file
+                    }
+                  }}
+                />
+
+                {primaryUploading && (
+                  <div className="text-[12px] text-[#7A7772] font-medium">
+                    Uploading…
+                  </div>
+                )}
+
+                {errors.primaryImageUrl && (
+                  <div className="text-[12px] text-red-600 font-medium">
+                    {errors.primaryImageUrl}
+                  </div>
+                )}
+
+                {form.primaryImageUrl && (
+                  <div className="rounded-xl overflow-hidden ring-1 ring-[#E5E3DE] bg-[#faf9f6] h-48">
+                    <img
+                      src={form.primaryImageUrl}
+                      alt="Primary preview"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                )}
+              </div>
             </Section>
 
+            {/* Gallery */}
             <Section
               title="Additional Images"
-              subtitle="Extra product photos — gallery, details, alternate angles"
+              subtitle="Upload extra product photos — gallery, details, alternate angles"
               action={
                 <span className="text-[12px] text-[#7A7772] font-medium">
                   {form.images.length} added
                 </span>
               }
             >
+              {/* Existing gallery list */}
               <div className="space-y-3 mb-4">
                 {form.images.length === 0 && (
                   <div className="text-[13px] text-[#7A7772] py-2 text-center">
                     No additional images yet
                   </div>
                 )}
+
                 {form.images.map((img) => (
                   <RemovableItem
                     key={img.id}
@@ -608,56 +640,102 @@ export default function ProductForm() {
                     }
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-[#E5E3DE] shrink-0 overflow-hidden">
+                      <div className="w-10 h-10 rounded-lg bg-[#E5E3DE] shrink-0 overflow-hidden ring-1 ring-black/5">
                         <img
                           src={img.url}
-                          alt={img.alt}
+                          alt={img.alt || "Gallery"}
                           className="w-full h-full object-cover"
-                          onError={() => {}}
                         />
                       </div>
-                      <div className="min-w-0">
+
+                      <div className="min-w-0 flex-1">
                         <div className="truncate text-[12px] text-[#7A7772]">
                           {img.url}
                         </div>
-                        {img.alt && (
-                          <div className="text-[11px] text-[#7A7772]/60">
-                            Alt: {img.alt}
-                          </div>
-                        )}
+
+                        {/* Optional: let them edit alt text */}
+                        <input
+                          value={img.alt}
+                          onChange={(e) => {
+                            const next = form.images.map((x) =>
+                              x.id === img.id
+                                ? { ...x, alt: e.target.value }
+                                : x,
+                            );
+                            set("images", next);
+                          }}
+                          placeholder="Alt text (optional)"
+                          className="mt-2 w-full px-3 py-2 rounded-xl bg-white ring-1 ring-[#E5E3DE]
+                    focus:ring-[#1A1A1A] text-[13px] text-[#1A1A1A] font-medium
+                    placeholder:text-[#7A7772]/40 outline-none transition-all"
+                        />
                       </div>
                     </div>
                   </RemovableItem>
                 ))}
               </div>
 
+              {/* Upload new gallery images */}
               <div className="border-t border-[#E5E3DE] pt-4">
                 <div className="text-[12px] font-semibold text-[#7A7772] uppercase tracking-[0.04em] mb-3">
-                  Add Image
+                  Upload Images
                 </div>
-                <div className="grid grid-cols-[1fr_auto] gap-2 mb-2">
-                  <input
-                    className="px-3 py-2.5 rounded-xl bg-white ring-1 ring-[#E5E3DE] focus:ring-[#1A1A1A] text-[13px] text-[#1A1A1A] font-medium placeholder:text-[#7A7772]/40 outline-none transition-all"
-                    placeholder="Image URL"
-                    value={newImageUrl}
-                    onChange={(e) => setNewImageUrl(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        addImage();
-                      }
-                    }}
-                  />
-                  <Btn type="button" variant="secondary" onClick={addImage}>
-                    Add
-                  </Btn>
-                </div>
+
                 <input
-                  className="w-full px-3 py-2 rounded-xl bg-white ring-1 ring-[#E5E3DE] focus:ring-[#1A1A1A] text-[13px] text-[#1A1A1A] font-medium placeholder:text-[#7A7772]/40 outline-none transition-all"
-                  placeholder="Alt text (for accessibility)"
-                  value={newImageAlt}
-                  onChange={(e) => setNewImageAlt(e.target.value)}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="block w-full text-[13px] text-[#1A1A1A]
+            file:mr-3 file:px-4 file:py-2.5 file:rounded-xl
+            file:border-0 file:bg-[#E5E3DE] file:text-[#1A1A1A]
+            file:font-semibold hover:file:bg-[#d5d2cc]
+            cursor-pointer"
+                  onChange={async (e) => {
+                    const files = Array.from(e.target.files ?? []);
+                    if (!files.length) return;
+
+                    setGalleryError(null);
+
+                    try {
+                      setGalleryUploading(true);
+
+                      const uploads = await Promise.all(
+                        files.map((file) =>
+                          uploadToCloudinary(file),
+                        ),
+                      );
+
+                      const nextImages = [
+                        ...form.images,
+                        ...uploads.map((u, idx) => ({
+                          id: uid(),
+                          url: u,
+                          alt: "",
+                          sortOrder: form.images.length + idx,
+                        })),
+                      ];
+
+                      set("images", nextImages);
+                    } catch (err: any) {
+                      setGalleryError(err?.message ?? "Upload failed");
+                    } finally {
+                      setGalleryUploading(false);
+                      e.target.value = "";
+                    }
+                  }}
                 />
+
+                {galleryUploading && (
+                  <div className="mt-2 text-[12px] text-[#7A7772] font-medium">
+                    Uploading…
+                  </div>
+                )}
+
+                {galleryError && (
+                  <div className="mt-2 text-[12px] text-red-600 font-medium">
+                    {galleryError}
+                  </div>
+                )}
               </div>
             </Section>
           </div>

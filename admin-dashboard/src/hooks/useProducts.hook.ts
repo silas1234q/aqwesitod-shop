@@ -1,7 +1,10 @@
 import { useAuth } from "@clerk/clerk-react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchGraphQL } from "../api/graphql.api";
 import { GET_PRODUCTS, GET_PRODUCTS_BY_CATEGORY } from "../graphql/Product";
+import { apiCall } from "../api/apicall";
+
+const URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 export const useGetProducts = () => {
   const { getToken } = useAuth();
@@ -37,5 +40,30 @@ export const useGetProductsByCategory = (
         token,
       });
     },
+  });
+};
+
+export const useDeleteProduct = () => {
+  const { getToken } = useAuth();
+  const queryClient = useQueryClient();
+
+ return  useMutation({
+    mutationFn: async (productId:string) => {
+      const token = await getToken();
+      return apiCall(`${URL}/api/products/${productId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
+    onSuccess: () => {
+      // Invalidate or refetch queries related to products here if needed
+      queryClient.invalidateQueries(["products"]);
+    },
+    onError: (error) => {
+      console.error("Failed to delete product:", error);
+    }
   });
 };

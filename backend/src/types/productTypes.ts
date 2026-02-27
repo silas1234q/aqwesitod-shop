@@ -48,6 +48,7 @@ export interface ProductDetails {
   images: ProductImage[];
   categoryId: string;
   category: Category
+  stock: number | null;
   primaryImageUrl: string;
   details: ProductDetail[];
   fabric: string;

@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
-import { deleteProduct } from "../data";
 import {
   Badge,
   Btn,
@@ -10,7 +9,7 @@ import {
   PageHeader,
   PRODUCT_BADGE,
 } from "../components/Ui";
-import { useGetProductsByCategory } from "../hooks/useProducts.hook";
+import { useDeleteProduct, useGetProductsByCategory } from "../hooks/useProducts.hook";
 import type { ProductDetails } from "../types/productTypes";
 import { useGetCategories } from "../hooks/useCategory.hook";
 
@@ -23,6 +22,10 @@ function formatMoney(cents: number) {
 export default function Products() {
   const { data: categoryData, isFetching: isCategoryLoading } = useGetCategories();
   const categories = categoryData?.categories ?? [];
+
+  // cast to any since the hook's return type is currently typed as void,
+  // but we expect it to provide a mutateAsync function.
+  const {mutateAsync: deleteProduct} = useDeleteProduct();
 
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
