@@ -1,10 +1,11 @@
 import { useAuth } from "@clerk/clerk-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchGraphQL } from "../api/graphql.api";
-import { GET_PRODUCTS, GET_PRODUCTS_BY_CATEGORY } from "../graphql/Product";
+import { GET_PRODUCT, GET_PRODUCTS, GET_PRODUCTS_BY_CATEGORY } from "../graphql/Product";
 import { apiCall } from "../api/apicall";
 
-const URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+const URL = "http://localhost:4000";
+//  import.meta.env.VITE_API_URL ||
 
 export const useGetProducts = () => {
   const { getToken } = useAuth();
@@ -47,8 +48,8 @@ export const useDeleteProduct = () => {
   const { getToken } = useAuth();
   const queryClient = useQueryClient();
 
- return  useMutation({
-    mutationFn: async (productId:string) => {
+  return useMutation({
+    mutationFn: async (productId: string) => {
       const token = await getToken();
       return apiCall(`${URL}/api/products/${productId}`, {
         method: "DELETE",
@@ -64,6 +65,73 @@ export const useDeleteProduct = () => {
     },
     onError: (error) => {
       console.error("Failed to delete product:", error);
-    }
+    },
+  });
+};
+
+export const useCreateProduct = () => {
+  const { getToken } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (productData: any) => {
+      const token = await getToken();
+      return apiCall(`${URL}/api/products`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(productData),
+      });
+    },
+    onSuccess: () => {
+      // Invalidate or refetch queries related to products here if needed
+      queryClient.invalidateQueries(["products"]);
+    },
+  });
+};
+
+export const useUpdateProduct = () => {
+  const { getToken } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      productId,
+      productData,
+    }: {
+      productId: string;
+      productData: any;
+    }) => {
+      const token = await getToken();
+      return apiCall(`${URL}/api/products/${productId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(productData),
+      });
+    },
+    onSuccess: () => {
+      // Invalidate or refetch queries related to products here if needed
+      queryClient.invalidateQueries(["products"]);
+    },
+  });
+};
+
+export const useGetProductById = (productId: string,{...options}) => {
+  const { getToken } = useAuth();
+  
+  return useQuery({
+    queryKey: ["product", productId],
+    queryFn: async () => {
+      const token = await getToken();
+      return fetchGraphQL({
+        query: GET_PRODUCT,
+        variables: { id: productId },
+        token,
+      });
+    },
+    ...options
   });
 };

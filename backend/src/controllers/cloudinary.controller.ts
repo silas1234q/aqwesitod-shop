@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
-import { catchAsync } from "../utils/catchAsync.js";
+import { catchAsync } from "../utils/catchAsync";
+import AppError from "../errors/AppError";
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -10,9 +11,13 @@ cloudinary.config({
 export const getUploadSignature = catchAsync(async (req, res) => {
   const { CLOUD_API_SECRET, CLOUD_API_KEY, CLOUD_NAME } = process.env;
 
-  if (!CLOUD_API_SECRET || !CLOUD_API_KEY || !CLOUD_NAME) {
-    return res.status(500).json({ message: "Cloudinary env vars missing" });
-  }
+  if (!CLOUD_API_SECRET || !CLOUD_API_KEY || !CLOUD_NAME) throw new AppError({
+    message: "Cloudinary credentials are not set in environment variables",
+    statusCode: 500,
+
+  });
+    
+  
 
   const timestamp = Math.round(Date.now() / 1000);
 

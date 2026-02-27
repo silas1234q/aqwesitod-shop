@@ -4,6 +4,7 @@ import { IoShareOutline } from "react-icons/io5";
 import type { ProductDetails, ProductVariant } from "../../types/productTypes";
 import { useAddToCart } from "../../hooks/cart.hooks";
 import { Link } from "react-router-dom";
+import { cld } from "../../utils/imageFormat";
 export const ProductDetailsContent = ({
   product,
 }: {
@@ -115,8 +116,7 @@ export const ProductDetailsContent = ({
             {/* Main Image */}
             <div className="aspect-3/4 overflow-hidden bg-gray-50">
               <img
-                src={selectedImage.url}
-                alt={selectedImage.alt}
+                src={cld(product.primaryImageUrl)}
                 className="w-full h-full object-cover"
               />
             </div>

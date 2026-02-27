@@ -2,7 +2,7 @@ const URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 export async function uploadToCloudinary(file: File) {
   // 1) get signature from backend
-  const sigRes = await fetch(`${URL}/cloudinary/cloudinary-signature`);
+  const sigRes = await fetch(`${URL}/api/cloudinary/cloudinary-signature`);
   if (!sigRes.ok) throw new Error("Failed to get Cloudinary signature");
 
   const { timestamp, signature, apiKey, cloudName, folder } = await sigRes.json();

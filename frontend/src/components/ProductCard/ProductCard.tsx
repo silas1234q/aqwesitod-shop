@@ -12,7 +12,7 @@ const ProductCard = ({ product}:{product :ProductDetails}) => {
         {/* Image Container */}
         <div className="relative aspect-square overflow-hidden bg-gray-100 mb-4">
           <img
-            src={product.images[0]?.url || ""}
+            src={product.primaryImageUrl || ""}
             alt={product.name}
             className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />

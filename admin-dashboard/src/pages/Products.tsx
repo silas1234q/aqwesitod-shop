@@ -226,7 +226,7 @@ export default function Products() {
                 </tr>
               ) : (
                 visibleProducts.map((p) => {
-                  const img = p.images?.[0]?.url || "";
+                  const img = p.primaryImageUrl;
                   const isOOS = p.inStock === false || p.stock === 0;
 
                   return (

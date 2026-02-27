@@ -3,6 +3,7 @@ import { Prisma, ProductCare, ProductColor, ProductDetail, ProductImage, Product
 import { prisma } from "../config/prisma";
 import NotFoundError from "../errors/NotFoundError";
 import ValidationErrors from "../errors/ValidationError";
+import { CreateProductInput, UpdateProductInput } from "../utils/zod.schema";
 
 // ─── Shared include ────────────────────────────────────────────────────────────
 
@@ -47,7 +48,7 @@ export const deleteProductService = async (productId: string) => {
 
 // ─── createProduct ────────────────────────────────────────────────────────────
 
-export async function createProduct(input:any) {
+export async function createProduct(input:CreateProductInput) {
   const {
     colors,
     sizes,
@@ -89,14 +90,14 @@ export async function createProduct(input:any) {
         stock:      stock      ?? null,
         categoryId: categoryId ?? null,
 
-        colors:  { create: colors.map( (c:ProductColor) => ({ name: c.name, hex: c.hex, sortOrder: c.sortOrder })) },
-        sizes:   { create: sizes.map(  (s:ProductSize) => ({ size: s.size, sortOrder: s.sortOrder })) },
-        images:  { create: images.map( (i:ProductImage) => ({ url: i.url, alt: i.alt ?? "", sortOrder: i.sortOrder })) },
-        details: { create: details.map((d:ProductDetail) => ({ value: d.value, sortOrder: d.sortOrder })) },
-        care:    { create: care.map(   (c:ProductCare) => ({ value: c.value, sortOrder: c.sortOrder })) },
+        colors:  { create: colors.map( (c) => ({ name: c.name, hex: c.hex, sortOrder: c.sortOrder })) },
+        sizes:   { create: sizes.map(  (s) => ({ size: s.size, sortOrder: s.sortOrder })) },
+        images:  { create: images.map( (i) => ({ url: i.url, alt: i.alt ?? "", sortOrder: i.sortOrder })) },
+        details: { create: details.map((d) => ({ value: d.value, sortOrder: d.sortOrder })) },
+        care:    { create: care.map(   (c) => ({ value: c.value, sortOrder: c.sortOrder })) },
 
         variants: {
-          create: variants.map((v:any) => ({
+          create: variants.map((v) => ({
             size:                 v.size,
             colorName:            v.colorName,
             sku:                  v.sku                  ?? null,
@@ -112,14 +113,7 @@ export async function createProduct(input:any) {
   });
 }
 
-// ─── updateProduct ────────────────────────────────────────────────────────────
-//
-// Relation strategy: full-replace.
-// If a relation key is present in the payload (even as []) → delete all existing
-// records and insert the new set.
-// If a relation key is absent entirely → leave existing records untouched.
-
-export async function updateProduct(id: string, input: any) {
+export async function updateProductService(id: string, input: UpdateProductInput) {
   // 1. Verify product exists and get current price for cross-field validation
   const existing = await prisma.product.findUnique({
     where:  { id },
@@ -127,7 +121,7 @@ export async function updateProduct(id: string, input: any) {
   });
 
   if (!existing) {
-    throw new NotFoundError(`Product with id "${id}".`);
+    throw new NotFoundError("Product");
   }
 
   // 2. Cross-field price validation
@@ -136,7 +130,7 @@ export async function updateProduct(id: string, input: any) {
     const effectivePrice = input.priceCents ?? existing.priceCents;
     if (input.discountedPriceCents != null && input.discountedPriceCents >= effectivePrice) {
       throw new ValidationErrors({
-        discountedPriceCents: "Discounted price must be less than the regular price",
+        discountedPriceCents: "Discounted price must be less than the full price",
       });
     }
   }
@@ -148,7 +142,7 @@ export async function updateProduct(id: string, input: any) {
       select: { id: true },
     });
     if (!category) {
-      throw new NotFoundError(`Category with id "${input.categoryId}" not found.`);
+      throw new NotFoundError(`Category with id "${input.categoryId}"`);
     }
   }
 
@@ -188,7 +182,7 @@ export async function updateProduct(id: string, input: any) {
       await tx.productColor.deleteMany({ where: { productId: id } });
       if (colors.length > 0) {
         await tx.productColor.createMany({
-          data: colors.map((c:any) => ({
+          data: colors.map((c) => ({
             productId: id,
             name:      c.name,
             hex:       c.hex,
@@ -202,7 +196,7 @@ export async function updateProduct(id: string, input: any) {
       await tx.productSize.deleteMany({ where: { productId: id } });
       if (sizes.length > 0) {
         await tx.productSize.createMany({
-          data: sizes.map((s:ProductSize) => ({
+          data: sizes.map((s) => ({
             productId: id,
             size:      s.size,
             sortOrder: s.sortOrder,
@@ -215,7 +209,7 @@ export async function updateProduct(id: string, input: any) {
       await tx.productImage.deleteMany({ where: { productId: id } });
       if (images.length > 0) {
         await tx.productImage.createMany({
-          data: images.map((i:ProductImage) => ({
+          data: images.map((i) => ({
             productId: id,
             url:       i.url,
             alt:       i.alt ?? "",
@@ -229,7 +223,7 @@ export async function updateProduct(id: string, input: any) {
       await tx.productDetail.deleteMany({ where: { productId: id } });
       if (details.length > 0) {
         await tx.productDetail.createMany({
-          data: details.map((d:ProductDetail) => ({
+          data: details.map((d) => ({
             productId: id,
             value:     d.value,
             sortOrder: d.sortOrder,
@@ -242,7 +236,7 @@ export async function updateProduct(id: string, input: any) {
       await tx.productCare.deleteMany({ where: { productId: id } });
       if (care.length > 0) {
         await tx.productCare.createMany({
-          data: care.map((c:ProductCare) => ({
+          data: care.map((c) => ({
             productId: id,
             value:     c.value,
             sortOrder: c.sortOrder,
@@ -257,7 +251,7 @@ export async function updateProduct(id: string, input: any) {
       await tx.productVariant.deleteMany({ where: { productId: id } });
       if (variants.length > 0) {
         await tx.productVariant.createMany({
-          data: variants.map((v:ProductVariant) => ({
+          data: variants.map((v) => ({
             productId:            id,
             size:                 v.size,
             colorName:            v.colorName,

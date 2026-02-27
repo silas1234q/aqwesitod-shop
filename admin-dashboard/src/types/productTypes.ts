@@ -46,6 +46,7 @@ export interface ProductDetails {
   priceCents: number;
   discountedPriceCents?: number;
   images: ProductImage[];
+  primaryImageUrl: string;
   categoryId: string;
   sku: string;
   category: Category;
