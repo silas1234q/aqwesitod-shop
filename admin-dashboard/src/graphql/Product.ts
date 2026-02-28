@@ -7,6 +7,7 @@ export const GET_PRODUCTS = gql`
       name
       description
       priceCents
+      instock
       primaryImageUrl
       categoryId
       images {
@@ -84,7 +85,7 @@ export const GET_PRODUCTS_BY_CATEGORY = gql`
       name
       description
       priceCents
-      categoryId
+      inStock
       primaryImageUrl
       images {
         id

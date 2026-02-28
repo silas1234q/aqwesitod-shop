@@ -81,7 +81,6 @@ export const GET_PRODUCTS_BY_CATEGORY = gql`
       description
       priceCents
       primaryImageUrl
-      categoryId
       images {
         id
         url

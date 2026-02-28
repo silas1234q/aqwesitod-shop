@@ -78,7 +78,7 @@ export default function Products() {
   }, [allProducts, removedIds, search]);
 
   const stats = useMemo(() => {
-    const active = visibleProducts.filter((p) => p.status === "active").length;
+    const active = visibleProducts.filter((p) => p.inStock === true).length;
     const draft = visibleProducts.filter((p) => p.status === "draft").length;
     const outOfStock = visibleProducts.filter(
       (p) => p.inStock === false || p.stock === 0
