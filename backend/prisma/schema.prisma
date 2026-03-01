@@ -44,7 +44,7 @@ model Product {
   createdAt            DateTime                 @default(now())
   updatedAt            DateTime                 @updatedAt
 
-  category             Category?                @relation(fields: [categoryId], references: [id])
+  category             Category?                @relation(fields: [categoryId], references: [id],onDelete: SetNull)
   care                 ProductCare[]
   colors               ProductColor[]
   details              ProductDetail[]

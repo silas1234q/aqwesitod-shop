@@ -7,6 +7,7 @@ import authRoutes from "./routers/auth.route";
 import cartRoutes from "./routers/cart.routes";
 import productRoute from './routers/product.route'
 import cloudinaryRoute from './routers/cloudinaryRoute';
+import categoryRoute from './routers/category.routes';
 import path from "node:path";
 
 const app = express();
@@ -66,6 +67,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api", cartRoutes);
 app.use("/api/products", productRoute);
 app.use("/api/cloudinary", cloudinaryRoute);
+app.use("/api/categories",categoryRoute );
 
 
 //serve frontend

@@ -138,8 +138,8 @@ export function Modal({
   return (
     <div
       className={cn(
-        "fixed inset-0 z-50 flex justify-center",
-        "items-end sm:items-center",
+        "fixed inset-10 z-50 flex justify-center",
+        "items-start sm:items-center",
         "p-3 sm:p-6",
         `bg-[${TOKENS.black}]/50 backdrop-blur-sm`,
         "animate-[fadeIn_140ms_ease]"

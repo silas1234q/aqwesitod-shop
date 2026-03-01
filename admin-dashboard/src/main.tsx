@@ -12,6 +12,7 @@ import Customers from "./pages/Customers";
 import Settings from "./pages/Settings";
 import { ClerkProvider } from "@clerk/clerk-react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Categories from "./pages/Category";
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,7 @@ const router = createBrowserRouter([
       { path: "products", element: <Products /> },
       { path: "products/new", element: <ProductForm /> },
       { path: "products/:id/edit", element: <ProductForm /> },
+       { path: "categories",       element: <Categories /> },
       { path: "orders", element: <Orders /> },
       { path: "customers", element: <Customers /> },
       { path: "settings", element: <Settings /> },
