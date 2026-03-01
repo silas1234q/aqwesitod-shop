@@ -1,13 +1,12 @@
 // import { products } from "../../utils/product";
 import { Link } from "react-router-dom";
-import { useGetProducts } from "../../hooks/useProducts.hook";
+import { useGetProductsByCategory } from "../../hooks/useProducts.hook";
 import type { ProductDetails } from "../../types/productTypes";
 import ProductCard from "../ProductCard/ProductCard";
 
 const BestSellers = () => {
-  const { data } = useGetProducts();
-
-  const products:ProductDetails[] = data?.products || [];
+  const { data} = useGetProductsByCategory("all", 4);
+  const products: ProductDetails[] = data?.productsByCategory || [];
 
   return (
     <section className="bg-white py-24 md:py-32">
@@ -28,9 +27,11 @@ const BestSellers = () => {
 
         {/* Products Grid */}
         <div className="grid gap-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {(products.slice(0, 8) as unknown as ProductDetails[]).map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+          {(products.slice(0, 8) as unknown as ProductDetails[]).map(
+            (product) => (
+              <ProductCard key={product.id} product={product} />
+            ),
+          )}
         </div>
 
         {/* View All Link */}

@@ -1,13 +1,15 @@
 // import { products } from "../../utils/product";
-import { useGetProducts } from "../../hooks/useProducts.hook";
+import {
+  useGetProductsByCategory,
+} from "../../hooks/useProducts.hook";
 import type { ProductDetails } from "../../types/productTypes";
 import ProductCard from "../ProductCard/ProductCard";
 import { Link } from "react-router-dom";
 import Loader from "../UtilsComponents/Loader";
 
 const NewCollection = () => {
-  const { data, isLoading } = useGetProducts();
-  const products = data?.products || [];
+  const { data, isLoading } = useGetProductsByCategory("all", 4);
+  const products: ProductDetails[] = data?.productsByCategory || [];
 
   console.log("Fetched products:", products);
   return (
